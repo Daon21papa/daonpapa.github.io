@@ -24,9 +24,14 @@ export function render() {
                 <div class="card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                         <h2 style="font-size: 1.25rem; font-weight: 700;">📅 AI 출결 관리</h2>
-                        <button class="btn" style="background: var(--gray-100);" onclick="window.features.efficiency.copyNeis()">
-                            <i data-lucide="copy"></i> 나이스 복사
-                        </button>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn" style="background: var(--gray-100); font-size: 0.8rem;" onclick="window.features.efficiency.openManager()">
+                                <i data-lucide="users"></i> 학생 관리
+                            </button>
+                            <button class="btn" style="background: var(--gray-100);" onclick="window.features.efficiency.copyNeis()">
+                                <i data-lucide="copy"></i> 나이스 복사
+                            </button>
+                        </div>
                     </div>
                     <div class="attendance-summary" style="display: flex; gap: 1rem; margin-bottom: 1rem;">
                         <div style="flex: 1; background: var(--primary-50); padding: 0.75rem; border-radius: var(--radius-md); text-align: center;">
@@ -52,24 +57,40 @@ export function render() {
                 </div>
             </div>
         </div>
+
+        <!-- Student Management Modal -->
+        <div id="student-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+            <div style="background: white; padding: 2rem; border-radius: 1rem; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto;">
+                <h3 style="margin-bottom: 1rem; font-size: 1.2rem; font-weight: 700;">학생 명단 관리</h3>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                    <input type="text" id="new-student-name" placeholder="이름 입력" style="flex: 1; padding: 0.5rem; border: 1px solid var(--gray-200); border-radius: 0.5rem;">
+                    <button class="btn btn-primary" onclick="window.features.efficiency.addStudent()">추가</button>
+                </div>
+                <ul id="manager-student-list" style="list-style: none; display: flex; flex-direction: column; gap: 0.5rem;">
+                    <!-- List -->
+                </ul>
+                <button class="btn" style="width: 100%; margin-top: 1rem; border: 1px solid var(--gray-300);" onclick="window.features.efficiency.closeManager()">닫기</button>
+            </div>
+        </div>
     `;
 }
 
 export function init() {
-    // Expose logic to global scope for inline onclicks (simple prototype hack)
+    // Expose logic to global scope
     window.features = window.features || {};
     window.features.efficiency = {
         notifyMissing: () => alert('미제출 학생 3명에게 알림을 발송했습니다!'),
         copyNeis: () => {
-            navigator.clipboard.writeText('3월 4일 출결: 전원 출석');
-            alert('나이스(NEIS) 형식으로 클립보드에 복사되었습니다.');
+            const absentList = students.filter(s => s.status !== 'present').map(s => s.name).join(', ');
+            const text = absentList ? `결석: ${absentList}` : '전원 출석';
+            navigator.clipboard.writeText(`3월 4일 출결: ${text}`);
+            alert(`클립보드에 복사되었습니다: ${text}`);
         },
         toggleAttendance: (id) => {
             const student = students.find(s => s.id === id);
             if (student) {
                 student.status = student.status === 'present' ? 'absent' : 'present';
                 renderAttendance();
-                // Save to localStorage in real app
             }
         },
         toggleCheck: (id) => {
@@ -78,25 +99,73 @@ export function init() {
                 item.done = !item.done;
                 renderChecklist();
             }
+        },
+        // Manager Functions
+        openManager: () => {
+            document.getElementById('student-modal').style.display = 'flex';
+            renderManagerList();
+        },
+        closeManager: () => {
+            document.getElementById('student-modal').style.display = 'none';
+        },
+        addStudent: () => {
+            const input = document.getElementById('new-student-name');
+            const name = input.value.trim();
+            if (name) {
+                const newId = students.length > 0 ? Math.max(...students.map(s => s.id)) + 1 : 1;
+                students.push({ id: newId, name: name, status: 'present', points: 0 });
+                saveStudents();
+                input.value = '';
+                renderManagerList();
+                renderAttendance();
+            }
+        },
+        removeStudent: (id) => {
+            if (confirm('정말 삭제하시겠습니까?')) {
+                students = students.filter(s => s.id !== id);
+                saveStudents();
+                renderManagerList();
+                renderAttendance();
+            }
         }
     };
 
-    // --- State Mock ---
+    // --- State & Persistence ---
     let checklistItems = [
         { id: 1, text: '가정통신문 제출', done: true },
         { id: 2, text: '우유 급식 신청서', done: false },
         { id: 3, text: '실내화 가져오기', done: false },
     ];
 
-    let students = Array.from({ length: 10 }, (_, i) => ({
-        id: i + 1,
-        name: `학생 ${i + 1}`,
-        status: 'present' // present, absent
-    }));
+    let students = [];
+
+    const loadStudents = () => {
+        const stored = localStorage.getItem('studentList');
+        if (stored) {
+            students = JSON.parse(stored);
+        } else {
+            // Default Demo Data
+            students = Array.from({ length: 5 }, (_, i) => ({
+                id: i + 1,
+                name: `학생 ${i + 1}`,
+                status: 'present',
+                points: 0
+            }));
+            localStorage.setItem('studentList', JSON.stringify(students));
+        }
+    };
+
+    const saveStudents = () => {
+        localStorage.setItem('studentList', JSON.stringify(students));
+    };
+
+    // Load Data
+    loadStudents();
 
     // --- Render Functions ---
     const renderChecklist = () => {
         const container = document.getElementById('checklist-items');
+        if (!container) return;
         container.innerHTML = checklistItems.map(item => `
             <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; border-bottom: 1px solid var(--gray-100);">
                 <div 
@@ -122,6 +191,7 @@ export function init() {
 
     const renderAttendance = () => {
         const list = document.getElementById('student-attendance-list');
+        if (!list) return;
         list.innerHTML = students.map(s => `
             <li style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px dashed var(--gray-100);">
                 <span>${s.name}</span>
@@ -141,6 +211,20 @@ export function init() {
         // Update stats
         document.getElementById('count-present').innerText = students.filter(s => s.status === 'present').length;
         document.getElementById('count-absent').innerText = students.filter(s => s.status !== 'present').length;
+    };
+
+    const renderManagerList = () => {
+        const list = document.getElementById('manager-student-list');
+        if (!list) return;
+        list.innerHTML = students.map(s => `
+            <li style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background: var(--gray-50); border-radius: 0.5rem;">
+                <span>${s.name}</span>
+                <button onclick="window.features.efficiency.removeStudent(${s.id})" style="color: var(--danger); background: none; border: none; cursor: pointer;">
+                    <i data-lucide="trash-2" style="width: 16px;"></i>
+                </button>
+            </li>
+        `).join('');
+        if (window.lucide) lucide.createIcons();
     };
 
     // Initial Render

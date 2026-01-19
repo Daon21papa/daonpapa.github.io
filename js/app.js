@@ -15,7 +15,7 @@ export const App = {
     async router() {
         const hash = window.location.hash.slice(1) || 'efficiency';
         const route = this.routes[hash];
-        
+
         if (!route) {
             window.location.hash = 'efficiency';
             return;
@@ -51,10 +51,23 @@ export const App = {
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         const now = new Date();
         document.getElementById('date-widget').innerText = now.toLocaleDateString('ko-KR', options);
+    },
+
+    loadUserProfile() {
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+            const user = JSON.parse(storedUser);
+            const profileName = document.querySelector('.user-profile .name');
+            const profileRole = document.querySelector('.user-profile .role');
+
+            if (profileName) profileName.innerText = user.name;
+            if (profileRole) profileRole.innerText = user.gradeClass;
+        }
     }
 };
 
 // Start App
 document.addEventListener('DOMContentLoaded', () => {
     App.init();
+    App.loadUserProfile();
 });
