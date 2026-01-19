@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>티처스 데스크 - 프리미엄 학급 경영</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">
+                <i data-lucide="graduation-cap"></i>
+                <span>Teacher's Desk</span>
+            </div>
+            
+            <ul class="nav-links">
+                <li><a href="#efficiency" class="nav-item active"><i data-lucide="zap"></i> 행정/관리</a></li>
+                <li><a href="#care" class="nav-item"><i data-lucide="heart-handshake"></i> 학생 케어</a></li>
+                <li><a href="#connection" class="nav-item"><i data-lucide="message-circle"></i> 소통</a></li>
+                <li><a href="#culture" class="nav-item"><i data-lucide="palette"></i> 학급 문화</a></li>
+            </ul>
+
+            <div class="user-profile">
+                <div class="avatar">T</div>
+                <div class="info">
+                    <span class="name">김선생님</span>
+                    <span class="role">6학년 2반</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1 id="page-title">학급 행정 및 관리</h1>
+                <div class="date-widget" id="date-widget">
+                    <!-- Date will be injected here -->
+                </div>
+            </header>
+
+            <div id="content-area" class="content-area">
+                <!-- Dynamic Content Loaded Here -->
+                <div class="loading-spinner">Loading...</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Core App Script -->
+    <script type="module" src="js/app.js"></script>
+    <script>
+        // Initialize Lucide Icons after DOM load just in case
+        window.addEventListener('DOMContentLoaded', () => {
+            if(window.lucide) lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
