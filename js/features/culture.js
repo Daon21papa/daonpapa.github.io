@@ -106,12 +106,35 @@ export function init() {
         },
         generateCharacter: () => {
             const output = document.getElementById('character-output');
-            output.innerHTML = '<span class="loading-spinner">생성중...</span>';
+            const style = document.getElementById('style-select').value;
+            const selectedAnimalBtn = document.querySelector('.animal-btn.selected');
+
+            // Map animal keywords to emojis or logic
+            let animalType = 'tiger';
+            let animalEmoji = '🐯';
+
+            if (selectedAnimalBtn) {
+                const text = selectedAnimalBtn.innerText;
+                if (text.includes('호랑이')) { animalType = 'tiger'; animalEmoji = '🐯'; }
+                else if (text.includes('독수리')) { animalType = 'eagle'; animalEmoji = '🦅'; }
+                else if (text.includes('돌고래')) { animalType = 'dolphin'; animalEmoji = '🐬'; }
+            }
+
+            output.innerHTML = '<span class="loading-spinner">AI 생성중...</span>';
+
+            // Simulate AI generation with random variation
             setTimeout(() => {
+                // Random adjective just for fun variety
+                const adjectives = ['용감한', '귀여운', '지혜로운', '날쌘', '창의적인'];
+                const randomAdj = adjectives[Math.floor(Math.random() * adjectives.length)];
+
                 output.innerHTML = `
-                    <div style="text-align: center;">
-                        <div style="font-size: 4rem;">🐯</div>
-                        <p style="font-weight: 600; margin-top: 1rem;">멋진 호랑이 캐릭터가 생성되었습니다!</p>
+                    <div style="text-align: center; animation: fadeIn 0.5s;">
+                        <div style="font-size: 5rem; margin-bottom: 0.5rem;">${animalEmoji}</div>
+                        <p style="font-weight: 600; font-size: 1.1rem; color: var(--gray-800);">
+                            ${style}의<br>
+                            <span style="color: var(--primary-600);">${randomAdj} ${animalType === 'tiger' ? '호랑이' : (animalType === 'eagle' ? '독수리' : '돌고래')}</span>
+                        </p>
                     </div>
                 `;
             }, 1500);

@@ -1,69 +1,136 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>티처스 데스크 - 프리미엄 학급 경영</title>
-    
+    <title>다온파파의 학급경영 - 로그인</title>
+
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 
-    <!-- Styles -->
-    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --primary-600: #4f46e5;
+            --primary-700: #4338ca;
+            --gray-50: #f8fafc;
+            --gray-200: #e2e8f0;
+            --gray-800: #1e293b;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--gray-50);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--gray-800);
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--gray-800);
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            box-sizing: border-box;
+            /* Fix for width overflow */
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--primary-600);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-700);
+        }
+
+        .footer {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+    </style>
 </head>
+
 <body>
-    <div id="app">
-        <!-- Sidebar Navigation -->
-        <nav class="sidebar">
-            <div class="logo">
-                <i data-lucide="graduation-cap"></i>
-                <span>Teacher's Desk</span>
+    <div class="login-container">
+        <h1>다온파파의 학급경영</h1>
+        <form id="login-form" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="username">아이디</label>
+                <input type="text" id="username" placeholder="선생님 아이디" required>
             </div>
-            
-            <ul class="nav-links">
-                <li><a href="#efficiency" class="nav-item active"><i data-lucide="zap"></i> 행정/관리</a></li>
-                <li><a href="#care" class="nav-item"><i data-lucide="heart-handshake"></i> 학생 케어</a></li>
-                <li><a href="#connection" class="nav-item"><i data-lucide="message-circle"></i> 소통</a></li>
-                <li><a href="#culture" class="nav-item"><i data-lucide="palette"></i> 학급 문화</a></li>
-            </ul>
-
-            <div class="user-profile">
-                <div class="avatar">T</div>
-                <div class="info">
-                    <span class="name">김선생님</span>
-                    <span class="role">6학년 2반</span>
-                </div>
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" placeholder="비밀번호" required>
             </div>
-        </nav>
-
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <header class="top-bar">
-                <h1 id="page-title">학급 행정 및 관리</h1>
-                <div class="date-widget" id="date-widget">
-                    <!-- Date will be injected here -->
-                </div>
-            </header>
-
-            <div id="content-area" class="content-area">
-                <!-- Dynamic Content Loaded Here -->
-                <div class="loading-spinner">Loading...</div>
-            </div>
-        </main>
+            <button type="submit">로그인</button>
+        </form>
+        <div class="footer">
+            © 2026 Teacher's Desk. All rights reserved.
+        </div>
     </div>
 
-    <!-- Core App Script -->
-    <script type="module" src="js/app.js"></script>
     <script>
-        // Initialize Lucide Icons after DOM load just in case
-        window.addEventListener('DOMContentLoaded', () => {
-            if(window.lucide) lucide.createIcons();
-        });
+        function handleLogin(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+
+            btn.innerText = '로그인 중...';
+            btn.disabled = true;
+
+            // Mock login delay
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 800);
+        }
     </script>
 </body>
+
 </html>

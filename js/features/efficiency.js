@@ -45,8 +45,10 @@ export function render() {
 
                 <!-- Today's Menu Widget -->
                 <div class="card" style="background: linear-gradient(135deg, #fff7ed 0%, #fff 100%);">
-                    <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">🍱 오늘의 급식</h2>
-                    <p style="color: var(--gray-500); font-size: 0.9rem;">현미밥, 쇠고기미역국, 돈육메추리알장조림, 배추김치, 우유</p>
+                    <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">🍱 오늘의 급식 (라온초)</h2>
+                    <p id="school-lunch-menu" style="color: var(--gray-500); font-size: 0.9rem;">
+                        <span class="loading-spinner">급식 정보 불러오는 중...</span>
+                    </p>
                 </div>
             </div>
         </div>
@@ -144,6 +146,44 @@ export function init() {
     // Initial Render
     renderChecklist();
     renderAttendance();
+    fetchLunchMenu();
+
+    // Menu Fetcher Logic
+    function fetchLunchMenu() {
+        const menuDisplay = document.getElementById('school-lunch-menu');
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        const dateStr = `${yyyy}${mm}${dd}`;
+
+        // NEIS Open API
+        const ATPT_OFCDC_SC_CODE = 'Q10'; // Jeonnam
+        const SD_SCHUL_CODE = '8531075'; // Raon Elementary
+        const API_URL = `https://open.neis.go.kr/hub/mealServiceDietInfo?Type=json&ATPT_OFCDC_SC_CODE=${ATPT_OFCDC_SC_CODE}&SD_SCHUL_CODE=${SD_SCHUL_CODE}&MLSV_YMD=${dateStr}`;
+
+        fetch(API_URL)
+            .then(response => response.json())
+            .then(data => {
+                try {
+                    if (data.mealServiceDietInfo) {
+                        const rawMenu = data.mealServiceDietInfo[1].row[0].DDISH_NM;
+                        // Clean up the string: remove <br/> and (1.2.3...) detail info
+                        const cleanMenu = rawMenu.replace(/<br\/>/g, ', ').replace(/\([0-9\.]+\)/g, '');
+                        menuDisplay.innerText = cleanMenu;
+                    } else {
+                        menuDisplay.innerText = "오늘은 급식 정보가 없습니다. (휴일/방학)";
+                    }
+                } catch (e) {
+                    console.error("Menu Parse Error", e);
+                    menuDisplay.innerText = "메뉴 정보를 불러올 수 없습니다.";
+                }
+            })
+            .catch(err => {
+                console.error("Menu Fetch Error", err);
+                menuDisplay.innerText = "네트워크 오류로 정보를 가져오지 못했습니다.";
+            });
+    }
 
     // Event Listeners
     document.getElementById('add-item-btn').addEventListener('click', () => {
